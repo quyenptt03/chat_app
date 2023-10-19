@@ -1,0 +1,6 @@
+D:\third year\network programing\Nhom6_ChatApp\Common\bin\Debug\Common.dll
+D:\third year\network programing\Nhom6_ChatApp\Common\bin\Debug\Common.pdb
+D:\third year\network programing\Nhom6_ChatApp\Common\obj\Debug\Common.csproj.AssemblyReference.cache
+D:\third year\network programing\Nhom6_ChatApp\Common\obj\Debug\Common.csproj.CoreCompileInputs.cache
+D:\third year\network programing\Nhom6_ChatApp\Common\obj\Debug\Common.dll
+D:\third year\network programing\Nhom6_ChatApp\Common\obj\Debug\Common.pdb

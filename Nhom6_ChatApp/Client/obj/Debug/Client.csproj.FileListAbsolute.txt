@@ -1,0 +1,14 @@
+D:\third year\network programing\Nhom6_ChatApp\Client\bin\Debug\Client.exe.config
+D:\third year\network programing\Nhom6_ChatApp\Client\bin\Debug\Client.exe
+D:\third year\network programing\Nhom6_ChatApp\Client\bin\Debug\Client.pdb
+D:\third year\network programing\Nhom6_ChatApp\Client\bin\Debug\Common.dll
+D:\third year\network programing\Nhom6_ChatApp\Client\bin\Debug\Common.pdb
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.csproj.AssemblyReference.cache
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.frmClient.resources
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.frmLogin.resources
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.Properties.Resources.resources
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.csproj.GenerateResource.cache
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.csproj.CopyComplete
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.exe
+D:\third year\network programing\Nhom6_ChatApp\Client\obj\Debug\Client.pdb
