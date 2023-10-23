@@ -47,11 +47,13 @@ insert RoomChat(name) values('Nhom 1')
 insert RoomChat(name) values('Nhom 2')
 insert RoomChat(name) values('Nhom 3')
 
-insert Room_Account(roomID, accountID) values(1,1)
 insert Room_Account(roomID, accountID) values(2,1)
 insert Room_Account(roomID, accountID) values(3,1)
 insert Room_Account(roomID, accountID) values(2,2)
 insert Room_Account(roomID, accountID) values(3,2)
+insert Room_Account(roomID, accountID) values(2,3)
+insert Room_Account(roomID, accountID) values(2,4)
+insert Room_Account(roomID, accountID) values(3,4)
 
 insert PrivateMessage(accountID1, accountID2) values(1,2)
 insert PrivateMessage(accountID1, accountID2) values(1,3)
@@ -113,4 +115,15 @@ begin
 	from Message
 	inner join PrivateMessage on Message.privateMessageID = PrivateMessage.ID
 	where Message.privateMessageID = @privateMessageID
+end
+
+create procedure GetRoomMembersByID
+@roomID int
+as
+begin
+    select A.username as MemberUsername
+    from RoomChat as RC
+    join Room_Account as RA on RC.ID = RA.roomID
+    join Account as A on RA.accountID = A.ID
+    where RC.ID = @roomID
 end
