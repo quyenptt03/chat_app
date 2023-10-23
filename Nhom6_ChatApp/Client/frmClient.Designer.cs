@@ -45,10 +45,11 @@
             this.fpnListGroupChat = new System.Windows.Forms.FlowLayoutPanel();
             this.button2 = new System.Windows.Forms.Button();
             this.btnGroupSend = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtGroupInput = new System.Windows.Forms.TextBox();
             this.lvGroupMain = new System.Windows.Forms.ListView();
             this.lblUsername = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.lbgroubmember = new System.Windows.Forms.Label();
             this.tabPanel.SuspendLayout();
             this.serverTab.SuspendLayout();
             this.clientTab.SuspendLayout();
@@ -188,10 +189,11 @@
             // 
             // groupTab
             // 
+            this.groupTab.Controls.Add(this.lbgroubmember);
             this.groupTab.Controls.Add(this.fpnListGroupChat);
             this.groupTab.Controls.Add(this.button2);
             this.groupTab.Controls.Add(this.btnGroupSend);
-            this.groupTab.Controls.Add(this.textBox1);
+            this.groupTab.Controls.Add(this.txtGroupInput);
             this.groupTab.Controls.Add(this.lvGroupMain);
             this.groupTab.Location = new System.Drawing.Point(4, 25);
             this.groupTab.Name = "groupTab";
@@ -228,14 +230,14 @@
             this.btnGroupSend.Text = "Send";
             this.btnGroupSend.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // txtGroupInput
             // 
-            this.textBox1.Location = new System.Drawing.Point(256, 504);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(412, 54);
-            this.textBox1.TabIndex = 23;
+            this.txtGroupInput.Location = new System.Drawing.Point(256, 504);
+            this.txtGroupInput.Margin = new System.Windows.Forms.Padding(4);
+            this.txtGroupInput.Multiline = true;
+            this.txtGroupInput.Name = "txtGroupInput";
+            this.txtGroupInput.Size = new System.Drawing.Size(412, 54);
+            this.txtGroupInput.TabIndex = 23;
             // 
             // lvGroupMain
             // 
@@ -251,10 +253,10 @@
             // lblUsername
             // 
             this.lblUsername.AutoSize = true;
-            this.lblUsername.Font = new System.Drawing.Font("Roboto", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(186)));
+            this.lblUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(186)));
             this.lblUsername.Location = new System.Drawing.Point(86, 46);
             this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size = new System.Drawing.Size(94, 22);
+            this.lblUsername.Size = new System.Drawing.Size(100, 22);
             this.lblUsername.TabIndex = 1;
             this.lblUsername.Text = "Username";
             // 
@@ -269,6 +271,16 @@
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
+            // lbgroubmember
+            // 
+            this.lbgroubmember.AutoSize = true;
+            this.lbgroubmember.Location = new System.Drawing.Point(20, 16);
+            this.lbgroubmember.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbgroubmember.Name = "lbgroubmember";
+            this.lbgroubmember.Size = new System.Drawing.Size(73, 16);
+            this.lbgroubmember.TabIndex = 27;
+            this.lbgroubmember.Text = "Thành viên";
+            // 
             // frmClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -280,6 +292,7 @@
             this.Name = "frmClient";
             this.Text = "Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmClient_FormClosing);
+            this.Load += new System.EventHandler(this.frmClient_Load);
             this.tabPanel.ResumeLayout(false);
             this.serverTab.ResumeLayout(false);
             this.serverTab.PerformLayout();
@@ -313,8 +326,9 @@
         private System.Windows.Forms.FlowLayoutPanel fpnListGroupChat;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btnGroupSend;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtGroupInput;
         private System.Windows.Forms.ListView lvGroupMain;
+        private System.Windows.Forms.Label lbgroubmember;
     }
 }
 

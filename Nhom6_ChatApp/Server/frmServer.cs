@@ -20,7 +20,7 @@ namespace Server
 {
     public partial class frmServer : Form
     {
-        string connectionString = "server=.; database = AccountManagement; Integrated Security = true;";
+        string connectionString = "server=LAPTOP-O54EI4N6\\SQLEXPRESS; database = AccountManagement; Integrated Security = true;";
         IPEndPoint IP;
         Socket server;
         List<Socket> clientList = new List<Socket>();
@@ -127,6 +127,7 @@ namespace Server
                 AddMessage(client.RemoteEndPoint.ToString() + ": Đã đóng kết nối");
                 clientList.Remove(client);
                 updateClientAccount(client);
+                LoadListClients();
                 getConnectedClientCount();
                 LoadListOnlineClients();
                 client.Close();
@@ -188,6 +189,11 @@ namespace Server
                 case QueryActionType.GetMessagesPrivateChat:
                     sendData.Data = getMessagesPrivateMessage(data.ID);
                     sendData.QA_Content = QueryActionType.GetMessagesPrivateChat;
+                    Send(client, sendData);
+                    break;
+                case QueryActionType.GetRoomMembersByID:
+                    sendData.Data = getRoomMembersByID(data.ID);
+                    sendData.QA_Content = QueryActionType.GetRoomMembersByID;
                     Send(client, sendData);
                     break;
             }
@@ -367,9 +373,58 @@ namespace Server
             return dt;
         }
 
+        // Save message off 
+        private void SaveMessage(string privateMessageID, string senderID, MessageData content)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+            // Lấy thời gian hiện tại
+            DateTime currentTime = DateTime.Now;
+
+            string sqlStr = "insert Message(privateMessageID, senderID, content, timestamp) values(@privateMessageID, @senderID, @content, @timestamp)";
+
+            using (SqlCommand cmd = new SqlCommand(sqlStr, conn))
+            {
+                // Thêm các tham số vào truy vấn SQL
+                cmd.Parameters.AddWithValue("@privateMessageID", privateMessageID);
+                cmd.Parameters.AddWithValue("@senderID", senderID);
+                cmd.Parameters.AddWithValue("@content", content);
+                cmd.Parameters.AddWithValue("@timestamp", currentTime);
+
+                // Thực thi truy vấn
+                cmd.ExecuteNonQuery();
+            }
+
+            conn.Close();
+
+        }
+        // Lấy danh sách thành viên trong 1 nhóm từ ID nhóm 
+        private DataTable getRoomMembersByID(int roomID)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec GetRoomMembersByID @roomID";
+
+            cmd.Parameters.Add("@roomID", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@roomID"].Value = roomID;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
+
         #endregion
 
-        
+
 
         // số lượng client kết nối vào server
         private void getConnectedClientCount()
@@ -395,7 +450,11 @@ namespace Server
             ListViewItem item = new ListViewItem(acc.Username);
             lv.Items.Add(item);
         }
-
+        private void RemoveClientLV(Account acc, ListView lv)
+        {
+            ListViewItem item = new ListViewItem(acc.Username);
+            lv.Items.Remove(item);
+        }
 
         // Load danh sách client từ db vào listview
         private void LoadListClientLV()
@@ -410,7 +469,16 @@ namespace Server
                 }
             }
         }
-
+        public void LoadListClients()
+        {
+            foreach (Account clientAcc in clientAccountList)
+            {
+                if (!clientList.Any(clientSocket => clientSocket == clientAcc.ClientSocket))
+                {
+                    clientAcc.Status = 0;
+                }
+            }
+        }
         //Load danh sách client đang onlinet
 
         private void LoadListOnlineClients()
