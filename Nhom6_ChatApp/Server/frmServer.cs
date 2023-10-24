@@ -192,7 +192,7 @@ namespace Server
                     sendData.Data = getMessagesPrivateMessage(data.ID);
                     sendData.QA_Content = QueryActionType.GetMessagesPrivateChat;
                     Send(client, sendData);
-                    DeleteMessagesPrivateMessage(data.ID);
+                   // DeleteMessagesPrivateMessage(data.ID);
                     break;
                 case QueryActionType.GetRoomMembersByID:
                     sendData.Data = getRoomMembersByID(data.ID);
