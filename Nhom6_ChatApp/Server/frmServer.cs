@@ -192,6 +192,7 @@ namespace Server
                     sendData.Data = getMessagesPrivateMessage(data.ID);
                     sendData.QA_Content = QueryActionType.GetMessagesPrivateChat;
                     Send(client, sendData);
+                    DeleteMessagesPrivateMessage(data.ID);
                     break;
                 case QueryActionType.GetRoomMembersByID:
                     sendData.Data = getRoomMembersByID(data.ID);
@@ -215,11 +216,12 @@ namespace Server
             {
                 if(clientAcc.Username == recvData.Receiver && clientAcc.Status == 0)
                 {   DataTable dt = getIDPrivateMessage((String)recvData.Sender, (String)recvData.Receiver);
-                    int privateMessageID;
-                    if (dt.Rows.Count > 0)
+                    DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
+                    if (dt.Rows.Count > 0 && IDUser.Rows.Count>0)
                     {
-                        privateMessageID = Convert.ToInt32(dt.Rows[0]["ID"]);
-                        SaveMessage(privateMessageID, clientAcc.ID, (String)recvData.Data);
+                        int ID= Convert.ToInt32(IDUser.Rows[0]["ID"]);
+                        int privateMessageID = Convert.ToInt32(dt.Rows[0]["ID"]);
+                        SaveMessage(privateMessageID, ID, (String)recvData.Data);
                         break;
                     } 
                    
@@ -451,6 +453,54 @@ namespace Server
             cmd.Parameters["@username1"].Value = username1;
             cmd.Parameters.Add("@username2", SqlDbType.NVarChar, 100);
             cmd.Parameters["@username2"].Value = username2;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
+
+
+        // Xóa tin nhắn trong private message từ ID
+        private DataTable DeleteMessagesPrivateMessage(int ID)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec DeleteMessageInPrivateMessage @ID";
+
+            cmd.Parameters.Add("@ID", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@ID"].Value = ID;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
+
+        private DataTable GetUserIDByUsername(string username)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec GetUserIDByUsername @username";
+
+            cmd.Parameters.Add("@username", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@username"].Value = username;
 
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();

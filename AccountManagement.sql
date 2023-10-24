@@ -74,7 +74,7 @@ insert Message(privateMessageID, senderID, content, timestamp) values(2, 3, N'Ch
 insert Message(privateMessageID, senderID, content, timestamp) values(1, 1, N'Chào bạn', CURRENT_TIMESTAMP)
 
 
-alter procedure GetPrivateMessagesByUsername
+create procedure GetPrivateMessagesByUsername
 @username nvarchar(100)
 as
 begin
@@ -106,7 +106,7 @@ begin
     and exists (select 1 from Message where roomID = RC.ID);
 end
 
-
+exec GetMessageInPrivateMessage 1
 alter procedure GetMessageInPrivateMessage
 @privateMessageID int
 as
@@ -127,3 +127,38 @@ begin
     join Account as A on RA.accountID = A.ID
     where RC.ID = @roomID
 end
+--Lấy Id của chat client
+CREATE PROCEDURE GetPrivateMessageID1
+    @username1 nvarchar(100),
+    @username2 nvarchar(100)
+AS
+BEGIN
+    SELECT PM.ID
+    FROM PrivateMessage PM
+    JOIN Account A1 ON PM.accountID1 = A1.ID
+    JOIN Account A2 ON PM.accountID2 = A2.ID
+    WHERE (A1.username = @username1 AND A2.username = @username2)
+       OR (A1.username = @username2 AND A2.username = @username1);
+END;
+EXEC GetPrivateMessageID1 'anh', 'quyen';
+select * from Message
+
+ CREATE PROCEDURE DeleteMessageInPrivateMessage
+@privateMessageID int
+AS
+BEGIN
+    DELETE FROM Message WHERE privateMessageID = @privateMessageID;
+END;
+
+EXEC DeleteMessageInPrivateMessage 1;
+
+
+CREATE PROCEDURE GetUserIDByUsername
+    @Username nvarchar(100)
+AS
+BEGIN
+    SELECT ID
+    FROM Account
+    WHERE username = @Username;
+END;
+exec GetUserIDByUsername 'anh'
