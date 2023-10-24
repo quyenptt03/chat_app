@@ -127,18 +127,4 @@ begin
     join Account as A on RA.accountID = A.ID
     where RC.ID = @roomID
 end
---Lấy Id của chat client
-CREATE PROCEDURE GetPrivateMessageID1
-    @username1 nvarchar(100),
-    @username2 nvarchar(100)
-AS
-BEGIN
-    SELECT PM.ID
-    FROM PrivateMessage PM
-    JOIN Account A1 ON PM.accountID1 = A1.ID
-    JOIN Account A2 ON PM.accountID2 = A2.ID
-    WHERE (A1.username = @username1 AND A2.username = @username2)
-       OR (A1.username = @username2 AND A2.username = @username1);
-END;
-EXEC GetPrivateMessageID1 'anh', 'quyen';
 
