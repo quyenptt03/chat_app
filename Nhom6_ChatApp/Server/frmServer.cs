@@ -15,6 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace Server
 {
@@ -208,11 +210,25 @@ namespace Server
 
         // xử lí tin nhắn gửi tới client
         private void handleMessageToClient(MessageData recvData)
-        {
+        {          
             foreach (Account clientAcc in clientAccountList)
             {
+                if(clientAcc.Username == recvData.Receiver && clientAcc.Status == 0)
+                {   DataTable dt = getIDPrivateMessage((String)recvData.Sender, (String)recvData.Receiver);
+                    int privateMessageID;
+                    if (dt.Rows.Count > 0)
+                    {
+                        privateMessageID = Convert.ToInt32(dt.Rows[0]["ID"]);
+                        SaveMessage(privateMessageID, clientAcc.ID, (String)recvData.Data);
+                        break;
+                    } 
+                   
+                }
                 if (clientAcc.Username == recvData.Receiver && clientAcc.Status == 1)
+                {
                     Send(clientAcc.ClientSocket, recvData);
+                }
+               
             }
         }
 
@@ -332,10 +348,10 @@ namespace Server
             conn.Open();
 
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "exec GetGroupChatsByUsername @username";
+            cmd.CommandText = "exec GetGroupChatsByUsername1 @username";
 
             cmd.Parameters.Add("@username", SqlDbType.NVarChar, 100);
-            cmd.Parameters["@username"].Value = username;
+            cmd.Parameters["@username"].Value = username.Trim();
 
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();
@@ -374,8 +390,9 @@ namespace Server
         }
 
         // Save message off 
-        private void SaveMessage(string privateMessageID, string senderID, MessageData content)
+        private void SaveMessage(int privateMessageID, int senderID, string content)
         {
+   
             SqlConnection conn = new SqlConnection(connectionString);
             conn.Open();
             // Lấy thời gian hiện tại
@@ -421,7 +438,31 @@ namespace Server
 
             return dt;
         }
+        //Lấy ID nhóm chat giữa 2 client
+        private DataTable getIDPrivateMessage(string username1, string username2)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
 
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec GetPrivateMessageID1 @username1 , @username2";
+
+            cmd.Parameters.Add("@username1", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@username1"].Value = username1;
+            cmd.Parameters.Add("@username2", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@username2"].Value = username2;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
         #endregion
 
 

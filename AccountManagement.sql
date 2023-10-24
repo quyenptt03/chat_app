@@ -35,7 +35,7 @@ create table Message(
 	content nvarchar(4000) not null,
 	timestamp datetime not null
 )
-
+SELECT * FROM Message
 insert Account(username, password) values('quyen', '123')
 insert Account(username, password) values('diep', '123')
 insert Account(username, password) values('thuy', '123')

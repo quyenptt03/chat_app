@@ -297,7 +297,6 @@ namespace Client
             Send(MessageType.Client, message, clientPartnerName);
             AddMessage("Me: " + message, lvClientMain);
 
-
         }
 
         private void btnGroupSend_Click(object sender, EventArgs e)
@@ -327,6 +326,7 @@ namespace Client
 
         private void frmClient_Load(object sender, EventArgs e)
         {
+
 
         }
     }
