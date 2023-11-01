@@ -350,7 +350,7 @@ namespace Server
             conn.Open();
 
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "exec GetGroupChatsByUsername1 @username";
+            cmd.CommandText = "exec GetGroupChatsByUsername @username";
 
             cmd.Parameters.Add("@username", SqlDbType.NVarChar, 100);
             cmd.Parameters["@username"].Value = username.Trim();
