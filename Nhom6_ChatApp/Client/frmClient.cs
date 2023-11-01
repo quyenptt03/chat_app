@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.SqlClient;
 
 namespace Client
 {
@@ -22,6 +23,7 @@ namespace Client
         Socket client;
         Account clientAccount = new Account();
         string clientPartnerName;
+
         public frmClient()
         {
             InitializeComponent();
@@ -50,9 +52,9 @@ namespace Client
                         clientAccount = (Account)frmLogin.Tag;
                         this.Text = clientAccount.Username;
                         lblUsername.Text = clientAccount.Username;
+                        queryToGetData(QueryActionType.GetPrivateChatsByUsername);
+                        queryToGetData(QueryActionType.GetGroupChatsByUsername);
 
-                       queryToGetData(QueryActionType.GetPrivateChatsByUsername);
-                       queryToGetData(QueryActionType.GetGroupChatsByUsername);
                     }
                 }
             }
@@ -67,7 +69,7 @@ namespace Client
             listen.Start();
         }
 
-        
+
         // Đóng kết nối socket
 
         void CloseConnection()
@@ -97,7 +99,7 @@ namespace Client
             }
             else if (type == MessageType.Group)
             {
-                sendData.Receiver = "diep,quyen,anh";
+                sendData.Receiver = receiver;//ID nhom "thuy,quyen"
             }
 
             client.Send(Serialize(sendData));
@@ -118,20 +120,27 @@ namespace Client
                     if (receiveData.Type == MessageType.Query)
                     {
                         handleReceiveQuery(receiveData);
-                    } else if (receiveData.Type == MessageType.Server)
+                    }
+                    else if (receiveData.Type == MessageType.Server)
                     {
                         mess = (string)receiveData.Data;
                         AddMessage($"{receiveData.Sender}: {mess}", lsvMain);
-                    } else if (receiveData.Type == MessageType.Client)
+                    }
+                    else if (receiveData.Type == MessageType.Client)
                     {
                         mess = (string)receiveData.Data;
                         AddMessage($"{receiveData.Sender}: {mess}", lvClientMain);
                     }
+                    else if (receiveData.Type == MessageType.Group)
+                    {
+                        mess = (string)receiveData.Data;
+                        AddMessage($"{receiveData.Sender}: {mess}", lvGroupMain);
+                    }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                MessageBox.Show("Có lỗi xảy ra trong quá trình nhận phản hồi từ server. Đóng kết nối");
+                MessageBox.Show("Có lỗi xảy ra trong quá trình nhận phản hồi từ server. Đóng kết nối", e.Message);
                 CloseConnection();
             }
         }
@@ -168,7 +177,8 @@ namespace Client
         #region handle receive data
         private void handleReceiveQuery(MessageData recvData)
         {
-            switch(recvData.QA_Content) {
+            switch (recvData.QA_Content)
+            {
                 case QueryActionType.GetPrivateChatsByUsername:
                     LoadPrivateMessageListToPanel((DataTable)recvData.Data);
                     break;
@@ -176,11 +186,18 @@ namespace Client
                 case QueryActionType.GetGroupChatsByUsername:
                     LoadGroupChatToPanel((DataTable)recvData.Data);
                     break;
+
                 case QueryActionType.GetMessagesPrivateChat:
                     LoadMessagesToListview((DataTable)recvData.Data, lvClientMain);
                     break;
+
+                case QueryActionType.GetRoomMembersByID:
+                    ConvertDataTableToString((DataTable)recvData.Data, lvGroupMain);
+                    break;
             }
         }
+
+
 
         #endregion
         // gửi truy vấn để lấy dữ liệu
@@ -220,7 +237,7 @@ namespace Client
                 Button button = new Button();
                 button.Text = row["roomChatName"].ToString();
                 button.Name = row["roomChatID"].ToString();
-                button.Click += privateMessageButton_Click;
+                button.Click += groupMessageButton_Click;
                 button.Width = fpnPrivateMessList.Width - 10;
                 button.Height = 50;
 
@@ -231,8 +248,8 @@ namespace Client
         // load danh sách tin nhắn vào listview
         private void LoadMessagesToListview(DataTable dt, ListView lv)
         {
-            lv.Items.Clear();
-            foreach(DataRow row in dt.Rows)
+            //lv.Items.Clear();
+            foreach (DataRow row in dt.Rows)
             {
                 string mess = $"{row["senderName"]}:  {row["content"]}";
                 AddMessage(mess, lv);
@@ -247,9 +264,20 @@ namespace Client
                 clientPartnerName = clickedButton.Text;
                 string chatID = clickedButton.Name;
                 queryToGetData(QueryActionType.GetMessagesPrivateChat, chatID);
+
+            }
+
+        }
+        // hàm xử lí sự kiện khi nhấn vào groub message
+        private void groupMessageButton_Click(object sender, EventArgs e)
+        {
+            if (sender is Button clickedButton)
+            {
+                string chatID = clickedButton.Name;
+                queryToGetData(QueryActionType.GetRoomMembersByID, chatID);
+
             }
         }
-
         private void frmClient_FormClosing(object sender, FormClosingEventArgs e)
         {
             //DialogResult result = MessageBox.Show("Bạn có chắc chắn muốn thoát không?", "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -263,14 +291,43 @@ namespace Client
             Send(MessageType.Server, message);
             AddMessage("Me: " + message, lsvMain);
         }
-
-        
-
         private void btnClientSend_Click(object sender, EventArgs e)
         {
             string message = txtClientInput.Text;
             Send(MessageType.Client, message, clientPartnerName);
             AddMessage("Me: " + message, lvClientMain);
+
+        }
+
+        private void btnGroupSend_Click(object sender, EventArgs e)
+        {
+            string message = txtGroupInput.Text;
+            Send(MessageType.Group, message, clientPartnerName);
+            AddMessage("Me: " + message, lvGroupMain);
+
+        }
+
+        private void ConvertDataTableToString(DataTable dt, ListView lv)
+        {
+
+            StringBuilder result = new StringBuilder();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (var item in row.ItemArray)
+                {
+                    result.Append(item.ToString() + ",");
+                }
+            }
+            result.Length -= 1;
+            lbgroubmember.Text = result.ToString();
+            clientPartnerName = result.ToString();
+        }
+
+        private void frmClient_Load(object sender, EventArgs e)
+        {
+
+
         }
     }
 }

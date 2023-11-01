@@ -15,12 +15,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace Server
 {
     public partial class frmServer : Form
     {
-        string connectionString = "server=.; database = AccountManagement; Integrated Security = true;";
+        string connectionString = "server=LAPTOP-O54EI4N6\\SQLEXPRESS; database = AccountManagement; Integrated Security = true;";
         IPEndPoint IP;
         Socket server;
         List<Socket> clientList = new List<Socket>();
@@ -127,6 +129,7 @@ namespace Server
                 AddMessage(client.RemoteEndPoint.ToString() + ": Đã đóng kết nối");
                 clientList.Remove(client);
                 updateClientAccount(client);
+                LoadListClients();
                 getConnectedClientCount();
                 LoadListOnlineClients();
                 client.Close();
@@ -189,6 +192,12 @@ namespace Server
                     sendData.Data = getMessagesPrivateMessage(data.ID);
                     sendData.QA_Content = QueryActionType.GetMessagesPrivateChat;
                     Send(client, sendData);
+                   // DeleteMessagesPrivateMessage(data.ID);
+                    break;
+                case QueryActionType.GetRoomMembersByID:
+                    sendData.Data = getRoomMembersByID(data.ID);
+                    sendData.QA_Content = QueryActionType.GetRoomMembersByID;
+                    Send(client, sendData);
                     break;
             }
         }
@@ -202,11 +211,26 @@ namespace Server
 
         // xử lí tin nhắn gửi tới client
         private void handleMessageToClient(MessageData recvData)
-        {
+        {          
             foreach (Account clientAcc in clientAccountList)
             {
+                if(clientAcc.Username == recvData.Receiver && clientAcc.Status == 0)
+                {   DataTable dt = getIDPrivateMessage((String)recvData.Sender, (String)recvData.Receiver);
+                    DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
+                    if (dt.Rows.Count > 0 && IDUser.Rows.Count>0)
+                    {
+                        int ID= Convert.ToInt32(IDUser.Rows[0]["ID"]);
+                        int privateMessageID = Convert.ToInt32(dt.Rows[0]["ID"]);
+                        SaveMessage(privateMessageID, ID, (String)recvData.Data);
+                        break;
+                    } 
+                   
+                }
                 if (clientAcc.Username == recvData.Receiver && clientAcc.Status == 1)
+                {
                     Send(clientAcc.ClientSocket, recvData);
+                }
+               
             }
         }
 
@@ -329,7 +353,7 @@ namespace Server
             cmd.CommandText = "exec GetGroupChatsByUsername @username";
 
             cmd.Parameters.Add("@username", SqlDbType.NVarChar, 100);
-            cmd.Parameters["@username"].Value = username;
+            cmd.Parameters["@username"].Value = username.Trim();
 
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();
@@ -367,9 +391,131 @@ namespace Server
             return dt;
         }
 
+        // Save message off 
+        private void SaveMessage(int privateMessageID, int senderID, string content)
+        {
+   
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+            // Lấy thời gian hiện tại
+            DateTime currentTime = DateTime.Now;
+
+            string sqlStr = "insert Message(privateMessageID, senderID, content, timestamp) values(@privateMessageID, @senderID, @content, @timestamp)";
+
+            using (SqlCommand cmd = new SqlCommand(sqlStr, conn))
+            {
+                // Thêm các tham số vào truy vấn SQL
+                cmd.Parameters.AddWithValue("@privateMessageID", privateMessageID);
+                cmd.Parameters.AddWithValue("@senderID", senderID);
+                cmd.Parameters.AddWithValue("@content", content);
+                cmd.Parameters.AddWithValue("@timestamp", currentTime);
+
+                // Thực thi truy vấn
+                cmd.ExecuteNonQuery();
+            }
+
+            conn.Close();
+
+        }
+        // Lấy danh sách thành viên trong 1 nhóm từ ID nhóm 
+        private DataTable getRoomMembersByID(int roomID)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec GetRoomMembersByID @roomID";
+
+            cmd.Parameters.Add("@roomID", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@roomID"].Value = roomID;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
+        //Lấy ID nhóm chat giữa 2 client
+        private DataTable getIDPrivateMessage(string username1, string username2)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec GetPrivateMessageID1 @username1 , @username2";
+
+            cmd.Parameters.Add("@username1", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@username1"].Value = username1;
+            cmd.Parameters.Add("@username2", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@username2"].Value = username2;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
+
+
+        // Xóa tin nhắn trong private message từ ID
+        private DataTable DeleteMessagesPrivateMessage(int ID)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec DeleteMessageInPrivateMessage @ID";
+
+            cmd.Parameters.Add("@ID", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@ID"].Value = ID;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
+
+        private DataTable GetUserIDByUsername(string username)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec GetUserIDByUsername @username";
+
+            cmd.Parameters.Add("@username", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@username"].Value = username;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
         #endregion
 
-        
+
 
         // số lượng client kết nối vào server
         private void getConnectedClientCount()
@@ -395,7 +541,11 @@ namespace Server
             ListViewItem item = new ListViewItem(acc.Username);
             lv.Items.Add(item);
         }
-
+        private void RemoveClientLV(Account acc, ListView lv)
+        {
+            ListViewItem item = new ListViewItem(acc.Username);
+            lv.Items.Remove(item);
+        }
 
         // Load danh sách client từ db vào listview
         private void LoadListClientLV()
@@ -410,7 +560,16 @@ namespace Server
                 }
             }
         }
-
+        public void LoadListClients()
+        {
+            foreach (Account clientAcc in clientAccountList)
+            {
+                if (!clientList.Any(clientSocket => clientSocket == clientAcc.ClientSocket))
+                {
+                    clientAcc.Status = 0;
+                }
+            }
+        }
         //Load danh sách client đang onlinet
 
         private void LoadListOnlineClients()

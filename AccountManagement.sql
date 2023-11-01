@@ -35,7 +35,7 @@ create table Message(
 	content nvarchar(4000) not null,
 	timestamp datetime not null
 )
-
+SELECT * FROM Message
 insert Account(username, password) values('quyen', '123')
 insert Account(username, password) values('diep', '123')
 insert Account(username, password) values('thuy', '123')
@@ -47,11 +47,13 @@ insert RoomChat(name) values('Nhom 1')
 insert RoomChat(name) values('Nhom 2')
 insert RoomChat(name) values('Nhom 3')
 
-insert Room_Account(roomID, accountID) values(1,1)
 insert Room_Account(roomID, accountID) values(2,1)
 insert Room_Account(roomID, accountID) values(3,1)
 insert Room_Account(roomID, accountID) values(2,2)
 insert Room_Account(roomID, accountID) values(3,2)
+insert Room_Account(roomID, accountID) values(2,3)
+insert Room_Account(roomID, accountID) values(2,4)
+insert Room_Account(roomID, accountID) values(3,4)
 
 insert PrivateMessage(accountID1, accountID2) values(1,2)
 insert PrivateMessage(accountID1, accountID2) values(1,3)
@@ -72,7 +74,7 @@ insert Message(privateMessageID, senderID, content, timestamp) values(2, 3, N'Ch
 insert Message(privateMessageID, senderID, content, timestamp) values(1, 1, N'Chào bạn', CURRENT_TIMESTAMP)
 
 
-alter procedure GetPrivateMessagesByUsername
+create procedure GetPrivateMessagesByUsername
 @username nvarchar(100)
 as
 begin
@@ -104,7 +106,7 @@ begin
     and exists (select 1 from Message where roomID = RC.ID);
 end
 
-
+exec GetMessageInPrivateMessage 1
 alter procedure GetMessageInPrivateMessage
 @privateMessageID int
 as
@@ -114,3 +116,51 @@ begin
 	inner join PrivateMessage on Message.privateMessageID = PrivateMessage.ID
 	where Message.privateMessageID = @privateMessageID
 end
+
+create procedure GetRoomMembersByID
+@roomID int
+as
+begin
+    select A.username as MemberUsername
+    from RoomChat as RC
+    join Room_Account as RA on RC.ID = RA.roomID
+    join Account as A on RA.accountID = A.ID
+    where RC.ID = @roomID
+end
+<<<<<<< HEAD
+--Lấy Id của chat client
+CREATE PROCEDURE GetPrivateMessageID1
+    @username1 nvarchar(100),
+    @username2 nvarchar(100)
+AS
+BEGIN
+    SELECT PM.ID
+    FROM PrivateMessage PM
+    JOIN Account A1 ON PM.accountID1 = A1.ID
+    JOIN Account A2 ON PM.accountID2 = A2.ID
+    WHERE (A1.username = @username1 AND A2.username = @username2)
+       OR (A1.username = @username2 AND A2.username = @username1);
+END;
+EXEC GetPrivateMessageID1 'anh', 'quyen';
+select * from Message
+
+ CREATE PROCEDURE DeleteMessageInPrivateMessage
+@privateMessageID int
+AS
+BEGIN
+    DELETE FROM Message WHERE privateMessageID = @privateMessageID;
+END;
+
+EXEC DeleteMessageInPrivateMessage 1;
+
+
+CREATE PROCEDURE GetUserIDByUsername
+    @Username nvarchar(100)
+AS
+BEGIN
+    SELECT ID
+    FROM Account
+    WHERE username = @Username;
+END;
+
+

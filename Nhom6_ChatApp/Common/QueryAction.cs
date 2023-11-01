@@ -13,7 +13,8 @@ namespace Common
         Login,
         GetPrivateChatsByUsername,
         GetGroupChatsByUsername,
-        GetMessagesPrivateChat
+        GetMessagesPrivateChat,
+        GetRoomMembersByID,
     }
 
     [Serializable]
