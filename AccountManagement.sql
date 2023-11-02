@@ -41,7 +41,7 @@ insert Account(username, password) values('diep', '123')
 insert Account(username, password) values('thuy', '123')
 insert Account(username, password) values('anh', '123')
 
-select * from Account
+select * from Room_Account
 
 insert RoomChat(name) values('Nhom 1')
 insert RoomChat(name) values('Nhom 2')
@@ -92,7 +92,7 @@ begin
     --and exists (select 1 from Message where privateMessageID = P.ID);
 end 
 
-alter procedure GetGroupChatsByUsername
+create  procedure GetGroupChatsByUsername
 @username nvarchar(100)
 as
 begin
@@ -105,6 +105,23 @@ begin
     where A.username = @username
     and exists (select 1 from Message where roomID = RC.ID);
 end
+
+
+create procedure GetGroupChatsByUsername1
+@username nvarchar(100)
+as
+begin
+    select
+        RC.ID as roomChatID,
+        RC.name as roomChatName
+    from RoomChat as RC
+    inner join Room_Account as RA on RC.ID = RA.roomID
+    inner join Account as A on RA.accountID = A.ID
+    where A.username = @username
+    
+end
+exec GetGroupChatsByUsername1 "thuy"
+
 
 exec GetMessageInPrivateMessage 1
 alter procedure GetMessageInPrivateMessage
@@ -162,5 +179,26 @@ BEGIN
     FROM Account
     WHERE username = @Username;
 END;
+--Lấy danh sách tin nhắn nhóm từ ID
+create procedure GetMessageRoomMessage
+@roomID int
+as
+begin
+    select 
+        Message.ID, 
+        Message.roomID, 
+        Message.senderID, 
+        Account.username as senderName, 
+        Message.content, 
+        Message.timestamp
+    from 
+        Message
+    inner join 
+        Account on Message.senderID = Account.ID
+    where 
+        Message.roomID = @roomID
+end
+exec GetMessageRoomMessage 3
 
-
+DELETE FROM Message
+WHERE roomID = 3;
