@@ -15,6 +15,7 @@ namespace Common
         GetGroupChatsByUsername,
         GetMessagesPrivateChat,
         GetRoomMembersByID,
+        GetMessagesRoomChat,
     }
 
     [Serializable]

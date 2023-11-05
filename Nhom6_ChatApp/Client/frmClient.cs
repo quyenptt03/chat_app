@@ -23,7 +23,7 @@ namespace Client
         Socket client;
         Account clientAccount = new Account();
         string clientPartnerName;
-
+        string chatRoomID;
         public frmClient()
         {
             InitializeComponent();
@@ -194,6 +194,10 @@ namespace Client
                 case QueryActionType.GetRoomMembersByID:
                     ConvertDataTableToString((DataTable)recvData.Data, lvGroupMain);
                     break;
+
+                case QueryActionType.GetMessagesRoomChat:
+                    LoadMessagesToListview((DataTable)recvData.Data, lvGroupMain);
+                    break;
             }
         }
 
@@ -273,8 +277,9 @@ namespace Client
         {
             if (sender is Button clickedButton)
             {
-                string chatID = clickedButton.Name;
-                queryToGetData(QueryActionType.GetRoomMembersByID, chatID);
+                chatRoomID = clickedButton.Name;
+                queryToGetData(QueryActionType.GetRoomMembersByID, chatRoomID);
+                queryToGetData(QueryActionType.GetMessagesRoomChat, chatRoomID);
 
             }
         }
@@ -299,13 +304,7 @@ namespace Client
 
         }
 
-        private void btnGroupSend_Click(object sender, EventArgs e)
-        {
-            string message = txtGroupInput.Text;
-            Send(MessageType.Group, message, clientPartnerName);
-            AddMessage("Me: " + message, lvGroupMain);
-
-        }
+    
 
         private void ConvertDataTableToString(DataTable dt, ListView lv)
         {
@@ -320,14 +319,15 @@ namespace Client
                 }
             }
             result.Length -= 1;
-            lbgroubmember.Text = result.ToString();
+            lbgroubmember.Text = "Thành viên: "+ result.ToString();
             clientPartnerName = result.ToString();
         }
 
-        private void frmClient_Load(object sender, EventArgs e)
+        private void btnGroupSend_Click(object sender, EventArgs e)
         {
-
-
+            string message =  txtGroupInput.Text;
+            Send(MessageType.Group,  message, chatRoomID + "," + clientPartnerName);
+            AddMessage("Me: " + message, lvGroupMain);
         }
     }
 }
