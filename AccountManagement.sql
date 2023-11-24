@@ -1,4 +1,4 @@
-﻿create database AccountManagement
+create database AccountManagement
 go
 use AccountManagement
 go
@@ -42,7 +42,6 @@ insert Account(username, password) values('thuy', '123')
 insert Account(username, password) values('anh', '123')
 
 
-select * from Account
 insert RoomChat(name) values('Nhom 1')
 insert RoomChat(name) values('Nhom 2')
 insert RoomChat(name) values('Nhom 3')
@@ -94,7 +93,6 @@ begin
 end 
 exec GetPrivateMessagesByUsername 'anh'
 
-alter procedure GetGroupChatsByUsername
 --Lấy nhóm từ tên (Quyen)
 create  procedure GetGroupChatsByUsername
 @username nvarchar(100)
@@ -109,7 +107,6 @@ begin
     where A.username = @username
     and exists (select 1 from Message where roomID = RC.ID);
 end
-
 
 --Lấy nhóm từ tên (Diep)
 create procedure GetGroupChatsByUsername1
@@ -185,7 +182,6 @@ BEGIN
     FROM Account
     WHERE username = @Username;
 END;
-
 exec GetUserIDByUsername 'thuy'
 
 --Lấy danh sách tin nhắn nhóm từ ID
