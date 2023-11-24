@@ -50,6 +50,7 @@
             this.lvGroupMain = new System.Windows.Forms.ListView();
             this.lblUsername = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.btnAddGroup = new System.Windows.Forms.Button();
             this.tabPanel.SuspendLayout();
             this.serverTab.SuspendLayout();
             this.clientTab.SuspendLayout();
@@ -189,6 +190,7 @@
             // 
             // groupTab
             // 
+            this.groupTab.Controls.Add(this.btnAddGroup);
             this.groupTab.Controls.Add(this.lbgroubmember);
             this.groupTab.Controls.Add(this.fpnListGroupChat);
             this.groupTab.Controls.Add(this.button2);
@@ -217,7 +219,7 @@
             this.fpnListGroupChat.AutoScroll = true;
             this.fpnListGroupChat.Location = new System.Drawing.Point(11, 35);
             this.fpnListGroupChat.Name = "fpnListGroupChat";
-            this.fpnListGroupChat.Size = new System.Drawing.Size(238, 523);
+            this.fpnListGroupChat.Size = new System.Drawing.Size(238, 461);
             this.fpnListGroupChat.TabIndex = 26;
             // 
             // button2
@@ -282,6 +284,16 @@
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
+            // btnAddGroup
+            // 
+            this.btnAddGroup.Location = new System.Drawing.Point(11, 505);
+            this.btnAddGroup.Name = "btnAddGroup";
+            this.btnAddGroup.Size = new System.Drawing.Size(238, 54);
+            this.btnAddGroup.TabIndex = 2;
+            this.btnAddGroup.Text = "Add Group";
+            this.btnAddGroup.UseVisualStyleBackColor = true;
+            this.btnAddGroup.Click += new System.EventHandler(this.btnAddGroup_Click);
+            // 
             // frmClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -329,6 +341,7 @@
         private System.Windows.Forms.TextBox txtGroupInput;
         private System.Windows.Forms.ListView lvGroupMain;
         private System.Windows.Forms.Label lbgroubmember;
+        private System.Windows.Forms.Button btnAddGroup;
     }
 }
 

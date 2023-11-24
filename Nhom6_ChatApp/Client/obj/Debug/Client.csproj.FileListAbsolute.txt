@@ -27,3 +27,4 @@ D:\A_FOOD\lap trinh mang\4\chat_app\Nhom6_ChatApp\Client\obj\Debug\Client.csproj
 D:\A_FOOD\lap trinh mang\4\chat_app\Nhom6_ChatApp\Client\obj\Debug\Client.csproj.CopyComplete
 D:\A_FOOD\lap trinh mang\4\chat_app\Nhom6_ChatApp\Client\obj\Debug\Client.exe
 D:\A_FOOD\lap trinh mang\4\chat_app\Nhom6_ChatApp\Client\obj\Debug\Client.pdb
+D:\A_FOOD\lap trinh mang\4\chat_app\Nhom6_ChatApp\Client\obj\Debug\Client.frmGroup.resources

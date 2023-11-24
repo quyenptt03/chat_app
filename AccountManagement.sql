@@ -41,7 +41,6 @@ insert Account(username, password) values('diep', '123')
 insert Account(username, password) values('thuy', '123')
 insert Account(username, password) values('anh', '123')
 
-select * from Room_Account
 
 insert RoomChat(name) values('Nhom 1')
 insert RoomChat(name) values('Nhom 2')
@@ -54,6 +53,7 @@ insert Room_Account(roomID, accountID) values(3,2)
 insert Room_Account(roomID, accountID) values(2,3)
 insert Room_Account(roomID, accountID) values(2,4)
 insert Room_Account(roomID, accountID) values(3,4)
+
 
 insert PrivateMessage(accountID1, accountID2) values(1,2)
 insert PrivateMessage(accountID1, accountID2) values(1,3)
@@ -73,8 +73,8 @@ insert Message(privateMessageID, senderID, content, timestamp) values(1, 2, N'He
 insert Message(privateMessageID, senderID, content, timestamp) values(2, 3, N'Chào bạn', CURRENT_TIMESTAMP)
 insert Message(privateMessageID, senderID, content, timestamp) values(1, 1, N'Chào bạn', CURRENT_TIMESTAMP)
 
-
-create procedure GetPrivateMessagesByUsername
+--Lấy người nhắn từ tên Username
+alter procedure GetPrivateMessagesByUsername
 @username nvarchar(100)
 as
 begin
@@ -91,7 +91,9 @@ begin
            or P.accountID2 = (select ID from Account where username = @username))
     --and exists (select 1 from Message where privateMessageID = P.ID);
 end 
+exec GetPrivateMessagesByUsername 'anh'
 
+--Lấy nhóm từ tên (Quyen)
 create  procedure GetGroupChatsByUsername
 @username nvarchar(100)
 as
@@ -106,7 +108,7 @@ begin
     and exists (select 1 from Message where roomID = RC.ID);
 end
 
-
+--Lấy nhóm từ tên (Diep)
 create procedure GetGroupChatsByUsername1
 @username nvarchar(100)
 as
@@ -122,7 +124,7 @@ begin
 end
 exec GetGroupChatsByUsername1 "thuy"
 
-
+--Lay tin nhăn chat cua 1 nguoi
 exec GetMessageInPrivateMessage 1
 alter procedure GetMessageInPrivateMessage
 @privateMessageID int
@@ -134,6 +136,7 @@ begin
 	where Message.privateMessageID = @privateMessageID
 end
 
+--Lay thành viên của 1 nhóm từ ID
 create procedure GetRoomMembersByID
 @roomID int
 as
@@ -144,8 +147,8 @@ begin
     join Account as A on RA.accountID = A.ID
     where RC.ID = @roomID
 end
-<<<<<<< HEAD
---Lấy Id của chat client
+
+--Lấy Id của chat client để lưu tin nhắn off
 CREATE PROCEDURE GetPrivateMessageID1
     @username1 nvarchar(100),
     @username2 nvarchar(100)
@@ -159,8 +162,8 @@ BEGIN
        OR (A1.username = @username2 AND A2.username = @username1);
 END;
 EXEC GetPrivateMessageID1 'anh', 'quyen';
-select * from Message
 
+--Xóa tin nhắn offline
  CREATE PROCEDURE DeleteMessageInPrivateMessage
 @privateMessageID int
 AS
@@ -170,7 +173,7 @@ END;
 
 EXEC DeleteMessageInPrivateMessage 1;
 
-
+--Lấy ID từ tên 
 CREATE PROCEDURE GetUserIDByUsername
     @Username nvarchar(100)
 AS
@@ -179,6 +182,8 @@ BEGIN
     FROM Account
     WHERE username = @Username;
 END;
+exec GetUserIDByUsername 'thuy'
+
 --Lấy danh sách tin nhắn nhóm từ ID
 create procedure GetMessageRoomMessage
 @roomID int
@@ -202,3 +207,92 @@ exec GetMessageRoomMessage 3
 
 DELETE FROM Message
 WHERE roomID = 3;
+
+-- Hàm sinh  tên nhóm
+ALTER FUNCTION SinhTenNhom() RETURNS NVARCHAR(100)
+AS
+BEGIN
+    DECLARE @MaxStt INT;
+    DECLARE @NewStt INT;
+    DECLARE @NewTenNhom NVARCHAR(100);
+
+    SELECT @MaxStt = ISNULL(MAX(CAST(SUBSTRING(name, LEN('Nhóm ')+1, LEN(name)-LEN('Nhóm ')) AS INT)), 0)
+    FROM RoomChat;
+
+    SET @NewStt = @MaxStt + 1;
+
+    SET @NewTenNhom = 'Nhóm ' + CAST(@NewStt AS NVARCHAR);
+
+    RETURN @NewTenNhom;
+END;
+
+
+--Tạo thành viên ra nhóm
+alter PROCEDURE CreateGroupWithMember
+    @MemberIDs NVARCHAR(MAX)
+AS
+BEGIN
+    DECLARE @NewRoomID INT;
+    DECLARE @GroupName NVARCHAR(100);
+
+    SET @GroupName = dbo.SinhTenNhom();
+
+    INSERT INTO RoomChat (name)
+    VALUES (@GroupName);
+
+    SET @NewRoomID = SCOPE_IDENTITY();
+
+    CREATE TABLE #TempMemberIDs (ID INT);
+
+    INSERT INTO #TempMemberIDs (ID)
+    SELECT CAST(value AS INT)
+    FROM dbo.SplitString(@MemberIDs, ',');
+
+    INSERT INTO Room_Account (roomID, accountID)
+    SELECT @NewRoomID, ID
+    FROM #TempMemberIDs;
+
+    DROP TABLE #TempMemberIDs;
+
+    PRINT N'Đã tạo nhóm thành công';
+END;
+
+CREATE FUNCTION SplitString
+(
+    @Input NVARCHAR(MAX),
+    @Delimiter NVARCHAR(255)
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    WITH Split (ID, Value, StartPos, EndPos) AS
+    (
+        SELECT
+            1,
+            SUBSTRING(@Input, 1, CHARINDEX(@Delimiter, @Input + @Delimiter) - 1),
+            CHARINDEX(@Delimiter, @Input),
+            CHARINDEX(@Delimiter, @Input + @Delimiter)
+        WHERE
+            CHARINDEX(@Delimiter, @Input) > 0
+        UNION ALL
+        SELECT
+            ID + 1,
+            SUBSTRING(@Input, EndPos + 1, CHARINDEX(@Delimiter, @Input + @Delimiter, EndPos + 1) - EndPos - 1),
+            CHARINDEX(@Delimiter, @Input, EndPos + 1),
+            CHARINDEX(@Delimiter, @Input + @Delimiter, EndPos + 1)
+        FROM
+            Split
+        WHERE
+            CHARINDEX(@Delimiter, @Input, EndPos + 1) > 0
+    )
+    SELECT
+        ID,
+        Value
+    FROM
+        Split
+);
+
+
+EXEC CreateGroupWithMember '1,3,4,';
+select * from Room_Account where roomID=27
