@@ -144,7 +144,7 @@ begin
     join Account as A on RA.accountID = A.ID
     where RC.ID = @roomID
 end
-<<<<<<< HEAD
+
 --Lấy Id của chat client
 CREATE PROCEDURE GetPrivateMessageID1
     @username1 nvarchar(100),

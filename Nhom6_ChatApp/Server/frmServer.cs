@@ -22,7 +22,7 @@ namespace Server
 {
     public partial class frmServer : Form
     {
-        string connectionString = "server=LAPTOP-O54EI4N6\\SQLEXPRESS; database = AccountManagement; Integrated Security = true;";
+        string connectionString = "server=.; database = AccountManagement; Integrated Security = true;";
         IPEndPoint IP;
         Socket server;
         List<Socket> clientList = new List<Socket>();
