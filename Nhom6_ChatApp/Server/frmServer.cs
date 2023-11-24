@@ -405,14 +405,14 @@ namespace Server
             return dt;
         }
 
-        // lấy danh sách group chat từ username
+        // lấy danh sách group chat từ username----------------
         private DataTable getGroupChatsByUsername(string username)
         {
             SqlConnection conn = new SqlConnection(connectionString);
             conn.Open();
 
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "exec GetGroupChatsByUsername @username";
+            cmd.CommandText = "exec GetGroupChatsByUsername1 @username";
 
             cmd.Parameters.Add("@username", SqlDbType.NVarChar, 100);
             cmd.Parameters["@username"].Value = username.Trim();
@@ -437,6 +437,29 @@ namespace Server
 
             SqlCommand cmd = conn.CreateCommand();
             cmd.CommandText = "exec GetMessageInPrivateMessage @ID";
+
+            cmd.Parameters.Add("@ID", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@ID"].Value = ID;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
+
+            return dt;
+        }
+        // lấy danh sách tin nhắn trong room message từ ID
+        private DataTable getMessagesRoomMessage(int ID)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec GetMessageRoomMessage @ID";
 
             cmd.Parameters.Add("@ID", SqlDbType.NVarChar, 100);
             cmd.Parameters["@ID"].Value = ID;
