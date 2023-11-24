@@ -23,7 +23,13 @@ namespace Client
         Socket client;
         Account clientAccount = new Account();
         string clientPartnerName;
+<<<<<<< HEAD
 
+=======
+        string chatRoomID;
+        DataTable PriTable;
+        string nameMember;
+>>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
         public frmClient()
         {
             InitializeComponent();
@@ -100,6 +106,10 @@ namespace Client
             else if (type == MessageType.Group)
             {
                 sendData.Receiver = receiver;//ID nhom "thuy,quyen"
+            }
+            else if (type == MessageType.AddGroup)
+            {
+                sendData.Receiver = receiver;
             }
 
             client.Send(Serialize(sendData));
@@ -181,6 +191,8 @@ namespace Client
             {
                 case QueryActionType.GetPrivateChatsByUsername:
                     LoadPrivateMessageListToPanel((DataTable)recvData.Data);
+                    PriTable = (DataTable)recvData.Data;
+                     
                     break;
 
                 case QueryActionType.GetGroupChatsByUsername:
@@ -234,14 +246,22 @@ namespace Client
         {
             foreach (DataRow row in dt.Rows)
             {
+                string buttonName = row["roomChatID"].ToString();
+                if (fpnListGroupChat.Controls.OfType<Button>().Any(b => b.Name == buttonName))
+                {
+                    continue;
+                }
                 Button button = new Button();
                 button.Text = row["roomChatName"].ToString();
-                button.Name = row["roomChatID"].ToString();
+                button.Name = buttonName;
                 button.Click += groupMessageButton_Click;
                 button.Width = fpnPrivateMessList.Width - 10;
                 button.Height = 50;
 
-                fpnListGroupChat.Controls.Add(button);
+                fpnListGroupChat.Invoke((MethodInvoker)delegate
+                {
+                    fpnListGroupChat.Controls.Add(button);
+                });
             }
         }
 
@@ -329,5 +349,23 @@ namespace Client
 
 
         }
+
+        private void btnAddGroup_Click(object sender, EventArgs e)
+        {
+            frmGroup AddfrmGroup = new frmGroup(PriTable);
+            AddfrmGroup.ShowDialog();
+            nameMember = AddfrmGroup.NameMember;
+
+            if (!string.IsNullOrEmpty(nameMember))
+            {
+                Send(MessageType.AddGroup, nameMember);
+                MessageBox.Show("Create a success group: " + nameMember + clientAccount.Username);
+
+            }
+            string n = clientAccount.Username;
+            queryToGetData(QueryActionType.GetGroupChatsByUsername);
+
+        }
+
     }
 }
