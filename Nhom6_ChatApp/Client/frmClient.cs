@@ -23,13 +23,9 @@ namespace Client
         Socket client;
         Account clientAccount = new Account();
         string clientPartnerName;
-<<<<<<< HEAD
-
-=======
         string chatRoomID;
         DataTable PriTable;
         string nameMember;
->>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
         public frmClient()
         {
             InitializeComponent();
@@ -295,6 +291,7 @@ namespace Client
             {
                 string chatID = clickedButton.Name;
                 queryToGetData(QueryActionType.GetRoomMembersByID, chatID);
+                queryToGetData(QueryActionType.GetMessagesRoomChat, chatRoomID);
 
             }
         }
@@ -318,7 +315,6 @@ namespace Client
             AddMessage("Me: " + message, lvClientMain);
 
         }
-
         private void btnGroupSend_Click(object sender, EventArgs e)
         {
             string message = txtGroupInput.Text;
@@ -326,7 +322,6 @@ namespace Client
             AddMessage("Me: " + message, lvGroupMain);
 
         }
-
         private void ConvertDataTableToString(DataTable dt, ListView lv)
         {
 
@@ -344,11 +339,7 @@ namespace Client
             clientPartnerName = result.ToString();
         }
 
-        private void frmClient_Load(object sender, EventArgs e)
-        {
 
-
-        }
 
         private void btnAddGroup_Click(object sender, EventArgs e)
         {

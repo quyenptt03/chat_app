@@ -1,4 +1,4 @@
-﻿create database AccountManagement
+create database AccountManagement
 go
 use AccountManagement
 go
@@ -41,10 +41,6 @@ insert Account(username, password) values('diep', '123')
 insert Account(username, password) values('thuy', '123')
 insert Account(username, password) values('anh', '123')
 
-<<<<<<< HEAD
-select * from Account
-=======
->>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
 
 insert RoomChat(name) values('Nhom 1')
 insert RoomChat(name) values('Nhom 2')
@@ -97,12 +93,8 @@ begin
 end 
 exec GetPrivateMessagesByUsername 'anh'
 
-<<<<<<< HEAD
-alter procedure GetGroupChatsByUsername
-=======
 --Lấy nhóm từ tên (Quyen)
 create  procedure GetGroupChatsByUsername
->>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
 @username nvarchar(100)
 as
 begin
@@ -116,8 +108,6 @@ begin
     and exists (select 1 from Message where roomID = RC.ID);
 end
 
-<<<<<<< HEAD
-=======
 --Lấy nhóm từ tên (Diep)
 create procedure GetGroupChatsByUsername1
 @username nvarchar(100)
@@ -135,7 +125,6 @@ end
 exec GetGroupChatsByUsername1 "thuy"
 
 --Lay tin nhăn chat cua 1 nguoi
->>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
 exec GetMessageInPrivateMessage 1
 alter procedure GetMessageInPrivateMessage
 @privateMessageID int
@@ -159,11 +148,7 @@ begin
     where RC.ID = @roomID
 end
 
-<<<<<<< HEAD
---Lấy Id của chat client
-=======
 --Lấy Id của chat client để lưu tin nhắn off
->>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
 CREATE PROCEDURE GetPrivateMessageID1
     @username1 nvarchar(100),
     @username2 nvarchar(100)
@@ -197,10 +182,6 @@ BEGIN
     FROM Account
     WHERE username = @Username;
 END;
-<<<<<<< HEAD
-
-
-=======
 exec GetUserIDByUsername 'thuy'
 
 --Lấy danh sách tin nhắn nhóm từ ID
@@ -315,4 +296,3 @@ RETURN
 
 EXEC CreateGroupWithMember '1,3,4,';
 select * from Room_Account where roomID=27
->>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
