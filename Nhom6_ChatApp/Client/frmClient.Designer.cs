@@ -42,7 +42,6 @@
             this.txtClientInput = new System.Windows.Forms.TextBox();
             this.lvClientMain = new System.Windows.Forms.ListView();
             this.groupTab = new System.Windows.Forms.TabPage();
-            this.lbgroubmember = new System.Windows.Forms.Label();
             this.fpnListGroupChat = new System.Windows.Forms.FlowLayoutPanel();
             this.button2 = new System.Windows.Forms.Button();
             this.btnGroupSend = new System.Windows.Forms.Button();
@@ -50,6 +49,7 @@
             this.lvGroupMain = new System.Windows.Forms.ListView();
             this.lblUsername = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.lbgroubmember = new System.Windows.Forms.Label();
             this.tabPanel.SuspendLayout();
             this.serverTab.SuspendLayout();
             this.clientTab.SuspendLayout();
@@ -202,16 +202,6 @@
             this.groupTab.Text = "Group";
             this.groupTab.UseVisualStyleBackColor = true;
             // 
-            // lbgroubmember
-            // 
-            this.lbgroubmember.AutoSize = true;
-            this.lbgroubmember.Location = new System.Drawing.Point(20, 16);
-            this.lbgroubmember.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lbgroubmember.Name = "lbgroubmember";
-            this.lbgroubmember.Size = new System.Drawing.Size(73, 16);
-            this.lbgroubmember.TabIndex = 27;
-            this.lbgroubmember.Text = "Thành viên";
-            // 
             // fpnListGroupChat
             // 
             this.fpnListGroupChat.AutoScroll = true;
@@ -239,7 +229,6 @@
             this.btnGroupSend.TabIndex = 24;
             this.btnGroupSend.Text = "Send";
             this.btnGroupSend.UseVisualStyleBackColor = true;
-            this.btnGroupSend.Click += new System.EventHandler(this.btnGroupSend_Click);
             // 
             // txtGroupInput
             // 
@@ -282,6 +271,16 @@
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
+            // lbgroubmember
+            // 
+            this.lbgroubmember.AutoSize = true;
+            this.lbgroubmember.Location = new System.Drawing.Point(20, 16);
+            this.lbgroubmember.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbgroubmember.Name = "lbgroubmember";
+            this.lbgroubmember.Size = new System.Drawing.Size(73, 16);
+            this.lbgroubmember.TabIndex = 27;
+            this.lbgroubmember.Text = "Thành viên";
+            // 
             // frmClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -293,6 +292,7 @@
             this.Name = "frmClient";
             this.Text = "Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmClient_FormClosing);
+            this.Load += new System.EventHandler(this.frmClient_Load);
             this.tabPanel.ResumeLayout(false);
             this.serverTab.ResumeLayout(false);
             this.serverTab.PerformLayout();

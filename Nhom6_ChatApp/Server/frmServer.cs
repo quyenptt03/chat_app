@@ -130,8 +130,8 @@ namespace Server
                 clientList.Remove(client);
                 updateClientAccount(client);
                 LoadListClients();
-                LoadListOnlineClients();
                 getConnectedClientCount();
+                LoadListOnlineClients();
                 client.Close();
             }
         }
@@ -199,11 +199,6 @@ namespace Server
                     sendData.QA_Content = QueryActionType.GetRoomMembersByID;
                     Send(client, sendData);
                     break;
-                case QueryActionType.GetMessagesRoomChat:
-                    sendData.Data = getMessagesRoomMessage(data.ID);
-                    sendData.QA_Content = QueryActionType.GetMessagesRoomChat;
-                    Send(client, sendData);
-                    break;
             }
         }
         // xử lí tin nhắn gửi tới server
@@ -243,21 +238,9 @@ namespace Server
         private void handleMessageToGroup(MessageData recvData)
         {
             string[] recvNameList = recvData.Receiver.Split(',');
-
             foreach (Account clientAcc in clientAccountList)
             {
-                if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 0)
-                {
-                    DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
-                    if (IDUser.Rows.Count > 0)
-                    {
-                        int ID = Convert.ToInt32(IDUser.Rows[0]["ID"]);
-                        SaveMessageRoom(int.Parse(recvNameList[0]), ID, (String)recvData.Data);
-                        
-                    }
-
-                }
-                 if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 1)
+                if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 1)
                 {
                     Send(clientAcc.ClientSocket, recvData);
                 }
@@ -360,14 +343,14 @@ namespace Server
             return dt;
         }
 
-        // lấy danh sách group chat từ username//----------------
+        // lấy danh sách group chat từ username
         private DataTable getGroupChatsByUsername(string username)
         {
             SqlConnection conn = new SqlConnection(connectionString);
             conn.Open();
 
             SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "exec GetGroupChatsByUsername1 @username";
+            cmd.CommandText = "exec GetGroupChatsByUsername @username";
 
             cmd.Parameters.Add("@username", SqlDbType.NVarChar, 100);
             cmd.Parameters["@username"].Value = username.Trim();
@@ -407,29 +390,7 @@ namespace Server
 
             return dt;
         }
-        // lấy danh sách tin nhắn trong room message từ ID
-        private DataTable getMessagesRoomMessage(int ID)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            conn.Open();
 
-            SqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "exec GetMessageRoomMessage @ID";
-
-            cmd.Parameters.Add("@ID", SqlDbType.NVarChar, 100);
-            cmd.Parameters["@ID"].Value = ID;
-
-            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            adapter.Fill(dt);
-
-
-            conn.Close();
-            conn.Dispose();
-            adapter.Dispose();
-
-            return dt;
-        }
         // Save message off 
         private void SaveMessage(int privateMessageID, int senderID, string content)
         {
@@ -445,34 +406,6 @@ namespace Server
             {
                 // Thêm các tham số vào truy vấn SQL
                 cmd.Parameters.AddWithValue("@privateMessageID", privateMessageID);
-                cmd.Parameters.AddWithValue("@senderID", senderID);
-                cmd.Parameters.AddWithValue("@content", content);
-                cmd.Parameters.AddWithValue("@timestamp", currentTime);
-
-                // Thực thi truy vấn
-                cmd.ExecuteNonQuery();
-            }
-
-            conn.Close();
-
-        }
-
-
-        // Save message room off 
-        private void SaveMessageRoom(int roomID, int senderID, string content)
-        {
-
-            SqlConnection conn = new SqlConnection(connectionString);
-            conn.Open();
-            // Lấy thời gian hiện tại
-            DateTime currentTime = DateTime.Now;
-
-            string sqlStr = "insert Message(roomID, senderID, content, timestamp) values(@roomID, @senderID, @content, @timestamp)";
-
-            using (SqlCommand cmd = new SqlCommand(sqlStr, conn))
-            {
-                // Thêm các tham số vào truy vấn SQL
-                cmd.Parameters.AddWithValue("@roomID", roomID);
                 cmd.Parameters.AddWithValue("@senderID", senderID);
                 cmd.Parameters.AddWithValue("@content", content);
                 cmd.Parameters.AddWithValue("@timestamp", currentTime);
