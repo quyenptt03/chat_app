@@ -15,11 +15,7 @@ namespace Common
         GetGroupChatsByUsername,
         GetMessagesPrivateChat,
         GetRoomMembersByID,
-<<<<<<< HEAD
-=======
         GetMessagesRoomChat,
-        
->>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
     }
 
     [Serializable]
