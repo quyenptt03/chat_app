@@ -13,7 +13,8 @@ namespace Common
         Query,
         Server,
         Client,
-        Group
+        Group,
+        AddGroup,
     }
 
     [Serializable]

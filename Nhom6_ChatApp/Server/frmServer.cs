@@ -29,6 +29,7 @@ namespace Server
         //danh sách tất cả các client
         List<Account> clientAccountList = new List<Account>();
         Account clientAccount = new Account();
+        string members;
         public frmServer()
         {
             InitializeComponent();
@@ -121,6 +122,10 @@ namespace Server
                     {
                         handleMessageToGroup(recvData);
                     }
+                    else if (recvData.Type == MessageType.AddGroup)
+                    {
+                        getIdbyUsernameMemberGroup(recvData);
+                    }
 
                 }
             }
@@ -136,7 +141,7 @@ namespace Server
             }
         }
 
-
+       
         // Thêm tin nhắn vào màn hình
         void AddMessage(string message)
         {
@@ -233,14 +238,48 @@ namespace Server
                
             }
         }
+        //Lấy Id của các thành viên để tạo nhóm
+        private void getIdbyUsernameMemberGroup(MessageData recvData)
+        {
+            string member = "";
+            string[] recvNameList;
 
+            if (recvData.Data is string dataString)
+            {
+                recvNameList = dataString.Split(',');
+                foreach (Account clientAcc in clientAccountList)
+                {
+                    if (recvNameList.Contains(clientAcc.Username))
+                    {
+                            member += clientAcc.ID.ToString()+',';
+                    }
+                }
+            }
+            DataTable IDUserSender = GetUserIDByUsername((String)recvData.Sender);
+            member += IDUserSender.Rows[0]["ID"].ToString() + ',';
+            CreateGroupWithMember(member.Trim());
+        }
         // xử lí tin nhắn tới group chat
         private void handleMessageToGroup(MessageData recvData)
         {
             string[] recvNameList = recvData.Receiver.Split(',');
             foreach (Account clientAcc in clientAccountList)
             {
+<<<<<<< HEAD
                 if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 1)
+=======
+                if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 0)
+                {
+                    DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
+                    if (IDUser.Rows.Count > 0)
+                    {
+                        int ID = Convert.ToInt32(IDUser.Rows[0]["ID"]);
+                        SaveMessageRoom(int.Parse(recvNameList[0]), ID, (String)recvData.Data); 
+                    }
+
+                }
+                 if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 1)
+>>>>>>> 80eac65439f495f379c526056fae3adba1d0a84e
                 {
                     Send(clientAcc.ClientSocket, recvData);
                 }
@@ -512,6 +551,28 @@ namespace Server
             adapter.Dispose();
 
             return dt;
+        }
+
+        //Tạo nhóm
+        private void CreateGroupWithMember(string members)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "exec CreateGroupWithMember @members";
+
+            cmd.Parameters.Add("@members", SqlDbType.NVarChar, 100);
+            cmd.Parameters["@members"].Value = members;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            conn.Close();
+            conn.Dispose();
+            adapter.Dispose();
         }
         #endregion
 
