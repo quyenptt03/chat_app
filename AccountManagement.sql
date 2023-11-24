@@ -74,7 +74,7 @@ insert Message(privateMessageID, senderID, content, timestamp) values(2, 3, N'Ch
 insert Message(privateMessageID, senderID, content, timestamp) values(1, 1, N'Chào bạn', CURRENT_TIMESTAMP)
 
 --Lấy người nhắn từ tên Username
-alter procedure GetPrivateMessagesByUsername
+create procedure GetPrivateMessagesByUsername
 @username nvarchar(100)
 as
 begin
@@ -122,11 +122,11 @@ begin
     where A.username = @username
     
 end
-exec GetGroupChatsByUsername1 "thuy"
+exec GetGroupChatsByUsername1 'thuy'
 
 --Lay tin nhăn chat cua 1 nguoi
-exec GetMessageInPrivateMessage 1
-alter procedure GetMessageInPrivateMessage
+
+create procedure GetMessageInPrivateMessage
 @privateMessageID int
 as
 begin
@@ -135,6 +135,7 @@ begin
 	inner join PrivateMessage on Message.privateMessageID = PrivateMessage.ID
 	where Message.privateMessageID = @privateMessageID
 end
+exec GetMessageInPrivateMessage 1
 
 --Lay thành viên của 1 nhóm từ ID
 create procedure GetRoomMembersByID
@@ -209,7 +210,7 @@ DELETE FROM Message
 WHERE roomID = 3;
 
 -- Hàm sinh  tên nhóm
-ALTER FUNCTION SinhTenNhom() RETURNS NVARCHAR(100)
+create FUNCTION SinhTenNhom() RETURNS NVARCHAR(100)
 AS
 BEGIN
     DECLARE @MaxStt INT;
@@ -228,7 +229,7 @@ END;
 
 
 --Tạo thành viên ra nhóm
-alter PROCEDURE CreateGroupWithMember
+create PROCEDURE CreateGroupWithMember
     @MemberIDs NVARCHAR(MAX)
 AS
 BEGIN
