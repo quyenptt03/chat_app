@@ -203,10 +203,6 @@ namespace Client
                 case QueryActionType.GetRoomMembersByID:
                     ConvertDataTableToString((DataTable)recvData.Data, lvGroupMain);
                     break;
-
-                case QueryActionType.GetMessagesRoomChat:
-                    LoadMessagesToListview((DataTable)recvData.Data, lvGroupMain);
-                    break;
             }
             
         }
@@ -295,8 +291,8 @@ namespace Client
         {
             if (sender is Button clickedButton)
             {
-                chatRoomID = clickedButton.Name;
-                queryToGetData(QueryActionType.GetRoomMembersByID, chatRoomID);
+                string chatID = clickedButton.Name;
+                queryToGetData(QueryActionType.GetRoomMembersByID, chatID);
                 queryToGetData(QueryActionType.GetMessagesRoomChat, chatRoomID);
 
             }
@@ -321,9 +317,18 @@ namespace Client
             AddMessage("Me: " + message, lvClientMain);
 
         }
+        private void btnGroupSend_Click(object sender, EventArgs e)
+        {
+            string message = txtGroupInput.Text;
+            Send(MessageType.Group, message, clientPartnerName);
+            AddMessage("Me: " + message, lvGroupMain);
 
+<<<<<<< HEAD
         
 
+=======
+        }
+>>>>>>> 7bdb216ed998a86d2342f8d702ab5fce748519d0
         private void ConvertDataTableToString(DataTable dt, ListView lv)
         {
 
@@ -337,16 +342,11 @@ namespace Client
                 }
             }
             result.Length -= 1;
-            lbgroubmember.Text = "Thành viên: "+ result.ToString();
+            lbgroubmember.Text = result.ToString();
             clientPartnerName = result.ToString();
         }
 
-        private void btnGroupSend_Click(object sender, EventArgs e)
-        {
-            string message =  txtGroupInput.Text;
-            Send(MessageType.Group,  message, chatRoomID + "," + clientPartnerName);
-            AddMessage("Me: " + message, lvGroupMain);
-        }
+
 
         private void btnAddGroup_Click(object sender, EventArgs e)
         {

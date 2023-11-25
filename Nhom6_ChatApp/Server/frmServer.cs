@@ -22,7 +22,7 @@ namespace Server
 {
     public partial class frmServer : Form
     {
-        string connectionString = "server=LAPTOP-O54EI4N6\\SQLEXPRESS; database = AccountManagement; Integrated Security = true;";
+        string connectionString = "server=.; database = AccountManagement; Integrated Security = true;";
         IPEndPoint IP;
         Socket server;
         List<Socket> clientList = new List<Socket>();
@@ -135,8 +135,8 @@ namespace Server
                 clientList.Remove(client);
                 updateClientAccount(client);
                 LoadListClients();
-                LoadListOnlineClients();
                 getConnectedClientCount();
+                LoadListOnlineClients();
                 client.Close();
             }
         }
@@ -204,11 +204,6 @@ namespace Server
                     sendData.QA_Content = QueryActionType.GetRoomMembersByID;
                     Send(client, sendData);
                     break;
-                case QueryActionType.GetMessagesRoomChat:
-                    sendData.Data = getMessagesRoomMessage(data.ID);
-                    sendData.QA_Content = QueryActionType.GetMessagesRoomChat;
-                    Send(client, sendData);
-                    break;
             }
         }
         // xử lí tin nhắn gửi tới server
@@ -252,6 +247,32 @@ namespace Server
 
             }
         }
+        // Save message room off 
+        private void SaveMessageRoom(int roomID, int senderID, string content)
+        {
+
+            SqlConnection conn = new SqlConnection(connectionString);
+            conn.Open();
+            // Lấy thời gian hiện tại
+            DateTime currentTime = DateTime.Now;
+
+            string sqlStr = "insert Message(roomID, senderID, content, timestamp) values(@roomID, @senderID, @content, @timestamp)";
+
+            using (SqlCommand cmd = new SqlCommand(sqlStr, conn))
+            {
+                // Thêm các tham số vào truy vấn SQL
+                cmd.Parameters.AddWithValue("@roomID", roomID);
+                cmd.Parameters.AddWithValue("@senderID", senderID);
+                cmd.Parameters.AddWithValue("@content", content);
+                cmd.Parameters.AddWithValue("@timestamp", currentTime);
+
+                // Thực thi truy vấn
+                cmd.ExecuteNonQuery();
+            }
+
+            conn.Close();
+
+        }
         //Lấy Id của các thành viên để tạo nhóm
         private void getIdbyUsernameMemberGroup(MessageData recvData)
         {
@@ -277,6 +298,7 @@ namespace Server
         private void handleMessageToGroup(MessageData recvData)
         {
             string[] recvNameList = recvData.Receiver.Split(',');
+<<<<<<< HEAD
 
             //foreach (Account clientAcc in clientAccountList)
             //{
@@ -299,6 +321,12 @@ namespace Server
             foreach (Account clientAcc in clientAccountList)
             {
                 if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender )
+=======
+            foreach (Account clientAcc in clientAccountList)
+            {
+                if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 1)
+                if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 0)
+>>>>>>> 7bdb216ed998a86d2342f8d702ab5fce748519d0
                 {
                     DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
                     if (IDUser.Rows.Count > 0)
@@ -412,7 +440,7 @@ namespace Server
             return dt;
         }
 
-        // lấy danh sách group chat từ username//----------------
+        // lấy danh sách group chat từ username----------------
         private DataTable getGroupChatsByUsername(string username)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -482,6 +510,7 @@ namespace Server
 
             return dt;
         }
+
         // Save message off 
         private void SaveMessage(int privateMessageID, int senderID, string content)
         {
@@ -508,6 +537,7 @@ namespace Server
             conn.Close();
 
         }
+<<<<<<< HEAD
 
         // Save message room off 
         private void SaveMessageRoom(int roomID, int senderID, string content)
@@ -535,6 +565,8 @@ namespace Server
             conn.Close();
 
         }
+=======
+>>>>>>> 7bdb216ed998a86d2342f8d702ab5fce748519d0
         // Lấy danh sách thành viên trong 1 nhóm từ ID nhóm 
         private DataTable getRoomMembersByID(int roomID)
         {
