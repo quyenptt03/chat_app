@@ -55,7 +55,9 @@ namespace Client
                         this.Text = clientAccount.Username;
                         lblUsername.Text = clientAccount.Username;
                         queryToGetData(QueryActionType.GetPrivateChatsByUsername);
-                        queryToGetData(QueryActionType.GetGroupChatsByUsername);
+                      
+                            queryToGetData(QueryActionType.GetGroupChatsByUsername);
+                        
 
                     }
                 }
@@ -190,7 +192,6 @@ namespace Client
                     PriTable = (DataTable)recvData.Data;
                      
                     break;
-
                 case QueryActionType.GetGroupChatsByUsername:
                     LoadGroupChatToPanel((DataTable)recvData.Data);
                     break;
@@ -207,6 +208,7 @@ namespace Client
                     LoadMessagesToListview((DataTable)recvData.Data, lvGroupMain);
                     break;
             }
+            
         }
 
 
@@ -268,7 +270,7 @@ namespace Client
         // load danh sách tin nhắn vào listview
         private void LoadMessagesToListview(DataTable dt, ListView lv)
         {
-            //lv.Items.Clear();
+            lv.Items.Clear();
             foreach (DataRow row in dt.Rows)
             {
                 string mess = $"{row["senderName"]}:  {row["content"]}";
@@ -320,7 +322,7 @@ namespace Client
 
         }
 
-    
+        
 
         private void ConvertDataTableToString(DataTable dt, ListView lv)
         {
@@ -358,7 +360,6 @@ namespace Client
                 MessageBox.Show("Create a success group: " + nameMember + clientAccount.Username);
 
             }
-            string n = clientAccount.Username;
             queryToGetData(QueryActionType.GetGroupChatsByUsername);
 
         }

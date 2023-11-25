@@ -224,23 +224,32 @@ namespace Server
         {          
             foreach (Account clientAcc in clientAccountList)
             {
-                if(clientAcc.Username == recvData.Receiver && clientAcc.Status == 0)
-                {   DataTable dt = getIDPrivateMessage((String)recvData.Sender, (String)recvData.Receiver);
-                    DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
-                    if (dt.Rows.Count > 0 && IDUser.Rows.Count>0)
-                    {
-                        int ID= Convert.ToInt32(IDUser.Rows[0]["ID"]);
-                        int privateMessageID = Convert.ToInt32(dt.Rows[0]["ID"]);
-                        SaveMessage(privateMessageID, ID, (String)recvData.Data);
-                        break;
-                    } 
-                   
-                }
-                if (clientAcc.Username == recvData.Receiver && clientAcc.Status == 1)
+                //if(clientAcc.Username == recvData.Receiver && clientAcc.Status == 0)
+                //{   DataTable dt = getIDPrivateMessage((String)recvData.Sender, (String)recvData.Receiver);
+                //    DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
+                //    if (dt.Rows.Count > 0 && IDUser.Rows.Count>0)
+                //    {
+                //        int ID= Convert.ToInt32(IDUser.Rows[0]["ID"]);
+                //        int privateMessageID = Convert.ToInt32(dt.Rows[0]["ID"]);
+                //        SaveMessage(privateMessageID, ID, (String)recvData.Data);
+                //        break;
+                //    } 
+
+                //}
+                //if (clientAcc.Username == recvData.Receiver && clientAcc.Status == 1)
+                //{
+                //    Send(clientAcc.ClientSocket, recvData);
+                //}
+
+                DataTable dt = getIDPrivateMessage((String)recvData.Sender, (String)recvData.Receiver);
+                DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
+                if (dt.Rows.Count > 0 && IDUser.Rows.Count > 0)
                 {
-                    Send(clientAcc.ClientSocket, recvData);
+                    int ID = Convert.ToInt32(IDUser.Rows[0]["ID"]);
+                    int privateMessageID = Convert.ToInt32(dt.Rows[0]["ID"]);
+                    SaveMessage(privateMessageID, ID, (String)recvData.Data);
                 }
-               
+
             }
         }
         //Lấy Id của các thành viên để tạo nhóm
@@ -269,23 +278,42 @@ namespace Server
         {
             string[] recvNameList = recvData.Receiver.Split(',');
 
+            //foreach (Account clientAcc in clientAccountList)
+            //{
+            //    if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 0)
+            //    {
+            //        DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
+            //        if (IDUser.Rows.Count > 0)
+            //        {
+            //            int ID = Convert.ToInt32(IDUser.Rows[0]["ID"]);
+            //            SaveMessageRoom(int.Parse(recvNameList[0]), ID, (String)recvData.Data); 
+            //        }
+
+            //    }
+            //     if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 1)
+            //    {
+            //        Send(clientAcc.ClientSocket, recvData);
+            //    }
+            //}
+
             foreach (Account clientAcc in clientAccountList)
             {
-                if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 0)
+                if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender )
                 {
                     DataTable IDUser = GetUserIDByUsername((String)recvData.Sender);
                     if (IDUser.Rows.Count > 0)
                     {
                         int ID = Convert.ToInt32(IDUser.Rows[0]["ID"]);
-                        SaveMessageRoom(int.Parse(recvNameList[0]), ID, (String)recvData.Data); 
+                        SaveMessageRoom(int.Parse(recvNameList[0]), ID, (String)recvData.Data);
+                        break;
                     }
 
                 }
-                 if (recvNameList.Contains(clientAcc.Username) && clientAcc.Username != recvData.Sender && clientAcc.Status == 1)
-                {
-                    Send(clientAcc.ClientSocket, recvData);
-                }
+                
+                
             }
+
+
         }
         #endregion
 
@@ -480,7 +508,6 @@ namespace Server
             conn.Close();
 
         }
-
 
         // Save message room off 
         private void SaveMessageRoom(int roomID, int senderID, string content)
